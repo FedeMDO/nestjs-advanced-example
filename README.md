@@ -27,6 +27,8 @@ $ npm install --force
 $ npm run init
 ```
 
+access to all services under http://localhost:8080/
+
 ## Test
 The testing scopes auth flow and e2e. We're not testing mongoose model functions like find, findOne, etc.
 
@@ -49,7 +51,7 @@ For e2e testing, be sure to first run ```docker-compose up``` or ```npm run init
 Check /docs folder to find a simple diagram showing the schemas design
 
 ### OpenAPI
-I have included swagger OpenAPI's documentation that you will find accessing to ```localhost:8080/api``` on your Browser. You can easily import a collection of request to your preferred HTTP client tool like Postman or Insomnia by accessing to ```localhost:8080/api-json``` that gives you a raw json representing the collection itself.
+I have included swagger OpenAPI's documentation that you will find accessing to http://localhost:8080/api on your Browser. You can easily import a collection of request to your preferred HTTP client tool like Postman or Insomnia by accessing to http://localhost:8080/api-json that gives you a raw json representing the collection itself.
 
 ## Comments
 Why NestJS? It's an awesome Typescript framework inspired on Angular. It has lot of helpful built-ins and wrappers of mongoose, passport, jwt as well that could simplify
