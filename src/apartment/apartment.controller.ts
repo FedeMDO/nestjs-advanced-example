@@ -1,16 +1,36 @@
-import { Body, Controller, Get, Post, Query } from '@nestjs/common';
-import { CreateApartmentDTO } from './apartment.dto';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import {
+  CreateApartmentDTO,
+  SearchFilters,
+  SearchFiltersDTO,
+} from './apartment.dto';
 import { Apartment } from './apartment.schema';
-import { ApartmentService, ISearchFilters } from './apartment.service';
+import { ApartmentService } from './apartment.service';
+import { ParseSearchFiltersPipe } from './pipes/filters.pipe';
 
 @Controller('apartment')
 export class ApartmentController {
   constructor(private readonly apartmentService: ApartmentService) {}
 
+  @ApiBearerAuth()
+  @ApiTags('Apartment')
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createApartment(
     @Body() createApartmentDto: CreateApartmentDTO,
+    @Request() req,
   ): Promise<Apartment> {
+    createApartmentDto.landlordUser = req.user._id; // from authenticated user
     return this.apartmentService.create(createApartmentDto);
   }
 
@@ -21,12 +41,12 @@ export class ApartmentController {
    *
    * @returns a collection of Apartments
    */
+  @ApiQuery({ type: SearchFiltersDTO })
+  @ApiTags('Apartment')
   @Get()
   async findAllApartments(
-    @Query() searchFilters: Partial<ISearchFilters>,
+    @Query(new ParseSearchFiltersPipe()) searchFilters: Partial<SearchFilters>,
   ): Promise<Apartment[]> {
-    return this.apartmentService.findAllWithFilters(
-      this.apartmentService.transformSearchFilters(searchFilters),
-    );
+    return this.apartmentService.findAllWithFilters(searchFilters);
   }
 }

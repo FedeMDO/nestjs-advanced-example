@@ -15,5 +15,6 @@ import { ApartmentSchema } from './apartment.schema';
   ],
   providers: [ApartmentService],
   controllers: [ApartmentController],
+  exports: [ApartmentService],
 })
 export class ApartmentModule {}

@@ -1,4 +1,4 @@
-FROM node:8
+FROM node:12.18.4
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --force
 # If you are building your code for production
 # RUN npm ci --only=production
 
@@ -16,4 +16,4 @@ RUN npm install
 COPY . .
 
 EXPOSE 3000
-CMD [ "npm", "run","start:dev" ]
+CMD [ "npm", "run", "start" ]

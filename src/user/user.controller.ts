@@ -2,41 +2,58 @@ import {
   Body,
   Controller,
   Get,
-  Param,
+  Request,
   Patch,
+  UseGuards,
   Post,
-  Query,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Apartment } from '../apartment/apartment.schema';
-import { CreateUserDTO } from './user.dto';
 import { User } from './user.schema';
 import { UserService } from './user.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CreateUserDTO, SwitchFavoriteDTO } from './user.dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  async createUser(@Body() createUserDto: CreateUserDTO): Promise<User> {
+  @ApiTags('User')
+  @Post('/register')
+  async registerUser(@Body() createUserDto: CreateUserDTO): Promise<User> {
     return this.userService.create(createUserDto);
   }
 
+  @ApiTags('User')
   @Get()
   async findAllUsers(): Promise<User[]> {
     return this.userService.findAll();
   }
 
-  // TODO get userId from JWT
-  @Get('/:userId/favorite')
-  async listFavorites(@Param('userId') userId: string): Promise<Apartment[]> {
-    return this.userService.listFavorites(userId);
+  @ApiBearerAuth()
+  @ApiTags('User')
+  @UseGuards(JwtAuthGuard)
+  @Get('/favorite')
+  async listFavorites(@Request() req): Promise<Apartment[]> {
+    return this.userService.listFavorites(req.user._id);
   }
 
+  @ApiBearerAuth()
+  @ApiTags('User')
+  @UseGuards(JwtAuthGuard)
   @Patch('/favorite')
   async switchFavorite(
-    @Body('apartmentId') apartmentId: string,
-    @Body('userId') userId: string,
+    @Body() body: SwitchFavoriteDTO,
+    @Request() req,
   ): Promise<User> {
-    return this.userService.switchFavorite(apartmentId, userId);
+    return this.userService.switchFavorite(body.apartmentId, req.user._id);
+  }
+
+  @ApiBearerAuth()
+  @ApiTags('User')
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  getProfile(@Request() req) {
+    return this.userService.findOne({ _id: req.user._id });
   }
 }

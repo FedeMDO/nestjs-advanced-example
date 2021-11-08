@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Apartment } from './apartment.schema';
 import { ApartmentService } from './apartment.service';
 import { haversineDistance } from './geolocation.util';
+import { ParseSearchFiltersPipe } from './pipes/filters.pipe';
 
 describe('ApartmentService', () => {
   // let service: ApartmentService;
@@ -26,5 +27,45 @@ describe('ApartmentService', () => {
     expect(
       Math.floor(haversineDistance(lat1, lon1, lat2, lon2, 'K')),
     ).toStrictEqual(11450); // source gmaps
+  });
+
+  it('should transform a URL query set of params into a SearchFilters object', () => {
+    const queryParams = {
+      latitude: '10',
+
+      longitude: '20',
+
+      maxDistance: '30',
+
+      cityName: 'Barcelona',
+
+      countryName: 'USA,Argentina,Spain,Germany',
+
+      nbRooms: '4',
+
+      isAvailable: 'true',
+    };
+
+    const expected = {
+      latitude: 10,
+
+      longitude: 20,
+
+      maxDistance: 30,
+
+      cityName: ['Barcelona'],
+
+      countryName: ['USA', 'Argentina', 'Spain', 'Germany'],
+
+      nbRooms: 4,
+
+      isAvailable: true,
+    };
+
+    const parser = new ParseSearchFiltersPipe();
+
+    const transformed = parser.transform(queryParams, null);
+
+    expect(transformed).toStrictEqual(expected);
   });
 });

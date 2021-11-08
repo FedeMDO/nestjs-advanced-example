@@ -1,19 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateApartmentDTO } from './apartment.dto';
+import { CreateApartmentDTO, SearchFilters } from './apartment.dto';
 import { Apartment, ApartmentDocument } from './apartment.schema';
 import { haversineDistance } from './geolocation.util';
-
-export interface ISearchFilters {
-  latitude?: string | number;
-  longitude?: string | number;
-  maxDistance?: string | number;
-  cityName?: string | string[];
-  countryName?: string | string[];
-  nbRooms?: number;
-  isAvailable?: boolean;
-}
 
 @Injectable()
 export class ApartmentService {
@@ -33,29 +23,18 @@ export class ApartmentService {
   }
 
   async findAllWithFilters(
-    searchFilters: Partial<ISearchFilters>,
+    searchFilters: Partial<SearchFilters>,
   ): Promise<Apartment[]> {
-    const query: Partial<Apartment> = {};
-    console.log(searchFilters);
     const $and = [];
-    if (
-      typeof searchFilters.cityName === 'string' &&
-      searchFilters.cityName.length
-    ) {
-      const splited = searchFilters.cityName.split(',');
-      const $or = splited.map((x) => {
+    if (Array.isArray(searchFilters.cityName)) {
+      const $or = searchFilters.cityName.map((x) => {
         return { 'locationInfo.cityName': x };
       });
-      //   query['locationInfo.cityName'] = searchFilters.cityName;
       $and.push({ $or });
     }
 
-    if (
-      typeof searchFilters.countryName === 'string' &&
-      searchFilters.countryName.length
-    ) {
-      const splited = searchFilters.countryName.split(',');
-      const $or = splited.map((x) => {
+    if (Array.isArray(searchFilters.countryName)) {
+      const $or = searchFilters.countryName.map((x) => {
         return { 'locationInfo.countryName': x };
       });
       $and.push({ $or });
@@ -68,7 +47,6 @@ export class ApartmentService {
     if (typeof searchFilters.isAvailable === 'boolean') {
       $and.push({ isAvailable: searchFilters.isAvailable });
     }
-    console.log($and);
 
     let result = await this.apartmentModel
       .find($and.length ? { $and } : undefined)
@@ -93,44 +71,13 @@ export class ApartmentService {
     return result;
   }
 
-  // I had some problems trying to use class-validators/transformers so I will transform the filters myself (I have less than 3 days to finish the challenge)
-  transformSearchFilters(
-    searchFilters: Partial<ISearchFilters>,
-  ): Partial<ISearchFilters> {
-    Object.assign(searchFilters, {
-      latitude:
-        typeof searchFilters.latitude === 'string' &&
-        (searchFilters.latitude as string).length
-          ? Number(searchFilters.latitude)
-          : undefined,
-      longitude:
-        typeof searchFilters.longitude === 'string' &&
-        (searchFilters.longitude as string).length
-          ? Number(searchFilters.longitude)
-          : undefined,
-      maxDistance:
-        typeof searchFilters.maxDistance === 'string' &&
-        (searchFilters.maxDistance as string).length
-          ? Number(searchFilters.maxDistance)
-          : undefined,
-      nbRooms:
-        typeof searchFilters.nbRooms === 'string' &&
-        (searchFilters.nbRooms as string).length
-          ? Number(searchFilters.nbRooms)
-          : undefined,
-      isAvailable:
-        searchFilters.isAvailable?.toString() === 'true'
-          ? true
-          : searchFilters.isAvailable?.toString() === 'false'
-          ? false
-          : undefined,
-    } as Partial<ISearchFilters>);
-
-    return searchFilters;
+  // for testing
+  async dropCollection(): Promise<boolean> {
+    return this.apartmentModel.collection.drop();
   }
 
   private shouldFilterByDistance(
-    searchFilters: Partial<ISearchFilters>,
+    searchFilters: Partial<SearchFilters>,
   ): boolean {
     return (
       typeof searchFilters.latitude === 'number' &&
