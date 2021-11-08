@@ -1,16 +1,16 @@
-Homelike Challenge
+Challenge
 Build with NestJS (Typescript), MongoDB, Docker (Compose), JWT Auth.
 
 ## Description
-Resolution of Homelike's challenge with a few tasks.
+API where you can register users. Users can create apartments. Users can be apartment landlords and at the same time, mark other apartments as favorites.
+Users are thought to be tenants of other apartments, but it's not covered by the scope of this service.
 
 Scope (Time available: 3 days):
-- Implementation of user and apartment modules (including services, controllers, schemas, dtos, etc) [DONE]
-- Implementation of a cool apartment filter [DONE]
-- Auth with JWT [DONE]
-- Testing [PARTIAL] // need to extend e2e
-
-This time I don't think I will have time to implement the GraphQL part. I don't have working experience with it (even if I'm eager to learn it).
+- Implementation of user and apartment modules (including services, controllers, schemas, dtos, etc)
+- Implementation of a cool apartment filter
+- Auth with JWT
+- Testing
+- OpenAPI Docs (Swagger)
 
 # Docker (docker-compose) needed in order to run app and mongodb
 
@@ -52,10 +52,10 @@ Check /docs folder to find a simple diagram showing the schemas design
 I have included swagger OpenAPI's documentation that you will find accessing to ```localhost:8080/api``` on your Browser. You can easily import a collection of request to your preferred HTTP client tool like Postman or Insomnia by accessing to ```localhost:8080/api-json``` that gives you a raw json representing the collection itself.
 
 ## Comments
-Why NestJS? It's an awesome Typescript framework inspired on Angular. It has lot of built-ins and wrappers of mongoose, passport, jwt as well as 
+Why NestJS? It's an awesome Typescript framework inspired on Angular. It has lot of helpful built-ins and wrappers of mongoose, passport, jwt as well that could simplify
+the implementation of the features (annotations @ support) and keeping good practices.
 
-I assume an user can be both a landlord (apartment's owner) and a tenant at the same time (that's why user can mark apartments as favorites). 
-(I asked something related to this by email but it was already out of working hours)
+I assume an user can be both a landlord (apartment's owner) and a tenant at the same time
 
 A "test" database is created by default in mongodb
 
