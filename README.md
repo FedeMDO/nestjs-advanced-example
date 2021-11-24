@@ -1,11 +1,10 @@
-Challenge
 Build with NestJS (Typescript), MongoDB, Docker (Compose), JWT Auth.
 
 ## Description
 API where you can register users. Users can create apartments. Users can be apartment landlords and at the same time, mark other apartments as favorites.
 Users are thought to be tenants of other apartments, but it's not covered by the scope of this service.
 
-Scope (Time available: 3 days):
+Scope:
 - Implementation of user and apartment modules (including services, controllers, schemas, dtos, etc)
 - Implementation of a cool apartment filter
 - Auth with JWT
